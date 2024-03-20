@@ -1,0 +1,90 @@
+---
+title: "Devoir 2"
+author: "Votre noms d'équipe"
+date: "13/03/2024"
+output: html_document
+---
+
+
+# À remettre sur Moodle au plus tard le 27 mars 2024 avant le début du cours. 
+
+## Question 1 
+### Mise en contexte
+
+Vous êtes impliqué dans un projet dont l'intérêt est d'étudier comment deux espèces bactériennes interagissent entre elles dans un environnement hautement contrôlé (c'est-à-dire une boîte de Petri). Au début de l'expérience, 25 individus de l'espèce *bogustonia proii* et 20 individus de l'espèce *aleastonia predatora* ont été inoculés dans la boîte de Petri. Pendant l'expérience, les individus de chaque espèce ont été comptés indépendamment toutes les heures pendant deux semaines (beaucoup d'efforts et de nuits blanches ont été nécessaires pour ce projet).  
+
+Les données qui ont été recueillies pendant ces deux semaines sont disponibles dans le fichier `2Bacteries.csv`.
+
+Un chercheur impliqué dans le projet pense que la relation entre les deux espèces bactériennes est une relation consommateur-ressource, mais il n'est pas certain de comment construire un modèle pour tester cette hypothèse. Comme il y a plusieurs façons de construire un modèle consommateur-ressource, proposer un modèle consommateur-ressource qui vous permettra de mieux caractériser la dynamique entre les deux espèces. 
+
+*Indice :* Un des chercheurs de l'équipe qui connait très bien l'espèce *bogustonia proii* a remarqué que dans une expérience similaire qui n'a durée que 5 jours, le taux de croissance de cette espèce n'était pas constant. Plus il y avait d'individu moins le taux de croissance était élevé.
+
+### 2 points
+
+a) Présenter le modèle que vous souhaitez utiliser. Assurez-vous de bien définir la notation pour le modèle.
+
+***
+
+### 8 points
+
+b) Implémentez le modèle que vous considérez le plus approprié dans R en utilisant les techniques apprises en cours et essayez une série de valeurs différentes pour trouver les meilleures paramètres. Utilisez la corrélation de Pearson pour trouver les paramètres qui correspondent le mieux aux données.
+
+***
+
+### 1 point
+
+c) Même si vous n'obtenez pas un modèle qui s'adapte très bien aux données, expliquez brièvement comment vous pensez que les différents modèles que vous obtenez peuvent aider à rejeter (ou non) l'hypothèse proposée par ce chercheur.
+
+***
+
+### 1 point
+
+d) Après avoir étudié les données en utilisant le modèle ressource-consommateur à la question précédent, proposez une nouvelle expérience qui aiderait à donner des réponses plus précises sur les facteurs générant le comportement périodique trouvé pour les deux espèces bactériennes.
+
+Assurez-vous que l'expérience puisse être réalisée dans un délai raisonnable (au maximum 2 semaines).
+
+***
+ 
+## Question 2 (10 points)
+
+Considerons le modèle de métapopulation de Levins,
+$$
+\begin{align}
+  \frac{dP}{dt} = cN_{occ}\left(1-\frac{N_{occ}}{N}\right)- eN_{occ}, \, \qquad N_{occ}(0)=N_{ini},
+\end{align}
+$$
+où $c$ est le taux de colonisation, $e$ le taux d'extinction, $N$ le nombre de sites considérés et $N_{occ}$ le nombre de sites où l'espèce est présente et $N_{occ}(t)$ est la nombre de sites occupés au temps $t$.
+
+Écrivez la fonction ```R``` ```metapopGill()``` qui implémente l'algorithme de Gillespie pour produire une réalisation du processus stochastique pour le modèle de métapopulation de Levins tel que définit par l'équation ci-dessus lorsque $N_{occ} \to \left(1-\frac{e}{c}\right)N$. Votre fonction doit avoir les arguments 
+  ```col```, ```ext```, ```N```,   ```Nini``` (nombre initial de site où l'espèce est présente) et ```tmax``` (le temps après lequel la simulation se termine). 
+
+Indice : il faut utiliser une boucle `while`.
+
+Note : N'oubliez pas de commenter votre code.
+
+***
+
+## Question 3 (10 points)  
+
+Comparer 3 itérations du modèle de métapopulation stochastiques avec le modèle de métapopulation déterministique pour $c=2$, $e=1$ $N_{ini}=1$ et
+  $N\in\{100,1000,10000, 100000\}$.  Présenter vos résultats dans des graphiques où chaque figure est définit par une valeur différente de $N$.
+
+***
+
+### Résultat pour $N=100$
+
+### Résultat pour $N=1000$
+
+### Résultat pour $N=10000$
+
+### Résultat pour $N=100000$
+
+***
+
+## Question 4 (2 points)
+
+Expliquer brièvement comment la taille de la population totale ($N$) influence la dynamique stochastique du modèle de métapopulation.  
+
+
+***
+
