@@ -1,7 +1,7 @@
 ---
 title: "Devoir 2"
-author: "Votre noms d'équipe"
-date: "13/03/2024"
+author: "Les lichens gameurs"
+date: "27/03/2024"
 output: html_document
 ---
 
