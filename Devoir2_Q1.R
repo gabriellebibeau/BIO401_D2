@@ -8,35 +8,20 @@ donnees <- read.csv('2Bacteries.csv')
 
 #Modèle ressource-consommateur ----
 
-#Fonction B. proii
-Bp <- function(t, N, parms_N = c(r_N, K_N)){ #N est dans les variables et non les paramètres
+Bp_Ap <- function(t, Cond_Ini, parms = c(r_N, K_N, alpha_N, r_P, K_P, alpha_P)){ #N est dans les variables et non les paramètres
   
-  with(as.list(parms_N), {
-    
-  #Croissance logistique
-    dN = r_N*N*(1-N/K_N)
-    
-    # Resultat
-    res <- dN
-    return(list(res))
-  })
-}
-
-#Fonction A. predatora
-Ap <- function(t, P, parms_P = c(r_P, K_P)){ #N est dans les variables et non les paramètres
-  
-  with(as.list(parms_P), {
+  with(as.list(Cond_Ini, parms), {
     
     #Croissance logistique
-    dP = r_P*P*(1-P/K_P)
+    dN = r_N*N*(1-((N + alpha_P*P)/K_N))
+    dP = r_P*P*(1-((P + alpha_N*N)/K_P))
     
     # Resultat
-    res <- dP
+    res <- c(dN=dN, dP=dP)
     return(list(res))
   })
 }
 
-#Faire juste un système d'équations avec les 2 
 
 #Conditions initiales
 N0 <- 25
@@ -46,19 +31,25 @@ CI <- c(N=N0, P=P0)
 #Paramètres
 r_N <- 0.4
 K_N <- 40
-parms_N <- c(r_N=r_N, K_N=K_N)
-
+alpha_N <- 1
 r_P <- 0.5
 K_P <- 30
-parms_P <- c(r_P=r_P, K_P=K_P)
-
-
-
+alpha_P <- 1.5
+parms <- c(r_N=r_N, K_N=K_N, alpha_N=alpha_N, 
+           r_P=r_P, K_P=K_P,alpha_P=alpha_P)
 
 
 #solution du système d'équations
-bugostonia_model <- ode(y=c(N=N0), times= seq(1,337), bF, parms)
-plot(bugostonia_model[,'time'], bugostonia_model[,'1'],)
+soln <- ode(y=CI, times= seq(1,337), Bp_Ap, parms)
+plot(soln[,'time'], soln[,'N'])
+plot(soln[,'time'], soln[,'P'])
+
+#� corriger
+ggplot(aes()) +
+  geom_line(soln[,'time'], soln[,'N'], color = 'cyan2') +
+  geom_line(soln[,'time'], soln[,'P'], color = 'salmon2') +
+  labs(title = "Mod�le", x = "Temps écoulé (1: 2h)", y = "Nombre d'individus") +
+  theme_minimal()
 
 
 #Graphique données expérimentales ----
