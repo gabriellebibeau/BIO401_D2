@@ -12,7 +12,7 @@ metapopMech <- function(t, P, parms = c(c,e,N)){
     dP <- c*P*N*(1-P) - e*P*N #dP/dt
     
     #Résultats
-    res <- c(dP=dP)
+    res <- P*dP
     return(list(res))
     
   }) #fin with
