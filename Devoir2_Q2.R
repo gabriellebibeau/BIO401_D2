@@ -17,18 +17,25 @@ metapopGill <- function(col, ext, N, Nini, tmax) {
   #2. Définir le taux global
   a0 <- sum(a) 
   
-  while(pas <= tmax){ #Tant que le temps de simulation demandé n'est pas atteint, continuer!
-    
   #3. Échantillonner temps t
-  t <- runif(1,0,a0) #nombre aléatoire entre 0 et le taux global d'évènement
+  while(pas <= tmax){ #Tant que le nombre de simulations demandé n'est pas atteint, continuer!
+    
+    if(Nt > 0 & Nt < N){ #si la méta-population n'est pas éteinte et n'a pas dépassée le nombre maximal de sites
+      
+      for (i in 1:Nt) { #reproduire l'évènement pour chaque site colonisé
+      t <- runif(1,0,a0) #nombre aléatoire entre 0 et le taux global d'évènement
   
   #4. Échantillonner le type d'évènements
-  if(t < intervalle[1]) {
-    Nt <- Nt + 1 #Un site colonisé de plus
-  }
-  else {
-    Nt <- Nt - 1 #Un site colonisé de moins
-  }
+      if(t < intervalle[1]) {
+        Nt <- Nt + 1 #Un site colonisé de plus
+      }
+      else {
+        Nt <- Nt - 1 #Un site colonisé de moins
+      }
+      
+    }#fin boucle for
+    
+  } #fin if éteint
   
   #5. Enregistrement de la donnée
   P <- Nt/N #Nouvelle proportion de sites colonisés

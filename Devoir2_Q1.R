@@ -57,7 +57,7 @@ parms_P <- c(r_P=r_P, K_P=K_P)
 
 
 #solution du système d'équations
-bugostonia_model <- ode(y=N0, times= seq(1,337), bF, parms)
+bugostonia_model <- ode(y=c(N=N0), times= seq(1,337), bF, parms)
 plot(bugostonia_model[,'time'], bugostonia_model[,'1'],)
 
 
