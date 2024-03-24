@@ -39,7 +39,7 @@ c) Même si vous n'obtenez pas un modèle qui s'adapte très bien aux données, 
 
 ### 1 point
 
-d) Après avoir étudié les données en utilisant le modèle ressource-consommateur à la question précédent, proposez une nouvelle expérience qui aiderait à donner des réponses plus précises sur les facteurs générant le comportement périodique trouvé pour les deux espèces bactériennes.
+d) Après avoir étudié les données en utilisant le modèle ressource-consommateur à la question précédente, proposez une nouvelle expérience qui aiderait à donner des réponses plus précises sur les facteurs générant le comportement périodique trouvé pour les deux espèces bactériennes.
 
 Assurez-vous que l'expérience puisse être réalisée dans un délai raisonnable (au maximum 2 semaines).
 
@@ -61,6 +61,63 @@ où $c$ est le taux de colonisation, $e$ le taux d'extinction, $N$ le nombre de 
 Indice : il faut utiliser une boucle `while`.
 
 Note : N'oubliez pas de commenter votre code.
+
+Voici notre fonction, il est à noter que nous avons assumé que notre métapopulation était un système fermé et qu'il était impossible pour elle de redémarrer une fois éteinte.
+
+```{r}
+metapopGill <- function(col, ext, N, Nini, tmax) {
+  
+  #Mise en jambes ;)
+  pas <- 1 #pas de temps
+  P0 <- Nini/N #Proportion initiale de sites occupés
+  P_mat <- matrix(data = NA, nrow = tmax+1, ncol = 2, dimnames = list(seq(1,tmax+1),c('Pas_temps', 'P'))) #matrice pour regrouper tous les P
+  P_mat[1,] <- c(0,P0) #Conditions initiales
+  Nt <- Nini #Nombre de sites colonisés qui changera à chaque pas de temps
+  
+  while(pas <= tmax){ #Tant que le nombre de simulations demandé n'est pas atteint, continuer!
+    
+    if(Nt > 0){ #si la méta-population n'est pas éteinte 
+      
+  #1. Définir les taux
+    colt <- col*(1- (Nt/N)) #Variation du taux de colonisation en fonction de la proportion de sites occupés
+    a <- c(colt, ext) #Vecteur de taux (colonisation et extinction)
+    intervalle <- cumsum(a) #calcul des intervalles des évènements
+  
+  #2. Définir le taux global
+    a0 <- sum(a) 
+  
+  #3. Échantillonner temps t
+      for (i in 1:Nt) { #reproduire l'évènement pour chaque site colonisé
+        t <- runif(1,0,a0) #nombre aléatoire entre 0 et le taux global d'évènement
+  
+  #4. Échantillonner le type d'évènements
+        if(t < intervalle[1]) {
+          Nt <- Nt + 1 #Un site colonisé de plus
+        }
+        else {
+          Nt <- Nt - 1 #Un site colonisé de moins
+        }
+      
+      }#fin boucle for
+    
+    } #fin if éteint
+  
+  #5. Enregistrement de la donnée
+  if(Nt > N) { #si la méta-population a dépassée le nombre maximal de sites
+    Nt <- N #Garder le nombre de site colonisé au maximum
+  }  
+  P <- Nt/N #Nouvelle proportion de sites colonisés
+  P_mat[pas+1,] <- c(pas,P) #Attention la ligne 1 est le temps 0 dans la matrice
+  
+  pas <- pas+1 #avancement du pas de temps
+  
+  }#fin boucle while
+  
+  return(P_mat) #la matrice des résultats pour chaque pas de temps est retournée
+  
+} #fin fonction
+```
+
 
 ***
 

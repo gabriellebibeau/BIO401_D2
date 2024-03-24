@@ -37,7 +37,7 @@ plot(mod_sto_100)
 #Simulation méchanistique
 mod_mec_100 <- ode(y=c(P=P0), times=seq(1,3), metapopMech, para) #monte à 0,5 très rapidement (t=2) et s'y stabilise
 plot(mod_mec_100[,'time'], mod_mec_100[,'P'])
-#pas probl�matique, voir cours 11 diapo 23
+#pas probl?matique, voir cours 11 diapo 23
 
 
 #Simulation N=1000 ----
