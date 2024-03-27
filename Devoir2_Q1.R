@@ -1,4 +1,4 @@
-#Mettre le bon working directory avec la fonction setwd()
+##      Mettre le bon working directory avec la fonction setwd()    ##
 #Librairies
 library(ggplot2)
 library(deSolve)
@@ -21,7 +21,13 @@ ggplot(df, aes(x = x, y = y, color = group)) +
   theme_minimal()
 
 
-#Modèle ----
+#Modèle Final----
+
+f_lin <- function(r, R) { #croissance de Bogustonia
+  res <- r*R #taux constant
+  return(res)
+}
+
 g_lin <- function(ac, R, C) { #taux de consommation de Bogustonia par Aleastonia
   res <- ac*R*C #linéaire
   return(res)
@@ -32,13 +38,13 @@ h_lin <- function(m, C) { #mortalité d'Aleastonia
   return(res)
 }
 
-Bp_Ap_CR <- function(t, Cond_Ini, parms = c(r, ac, epsilon, m)){
+Bp_Ap_CR <- function(t, Cond_Ini, parms = c(r, ac, m)){
   
   with(as.list(Cond_Ini, parms), {
     
     #Modèle
-    dR = R*r - g_lin(ac, R, C)
-    dC = epsilon*g_lin(ac, R, C) - h_lin(m, C)
+    dR = f_lin(r, R) - g_lin(ac, R, C)
+    dC = g_lin(ac, R, C) - h_lin(m, C) #epsilon devrait apparaitre devait g_lin(), mais nous assumons qu'il est égal à 1 pour simplifier
     
     # Resultat
     res <- c(dR=dR, dC=dC)
@@ -52,11 +58,10 @@ C0 <- 20
 CI <- c(R=R0, C=C0)
 
 #Paramètres
-r <- 0.15     
-epsilon <- 1
-m <- 0.4    
-ac <- 0.02
-para <- c(r=r, ac=ac, epsilon=epsilon, m=m)
+r <- 0.241
+ac <- 0.045
+m <- 0.408
+para <- c(r=r, ac=ac,m=m)
 
 soln <- ode(y=CI, times = seq(1,337), func = Bp_Ap_CR, parms = para)
 
@@ -68,6 +73,15 @@ ggplot() +
   labs(title = "Modèle Consommateur-Ressource", x = "Temps écoulé (h)", y = "Nombre d'individus") +
   theme_minimal()
 
+#Test de corrélation final
+Bp <- as.numeric(soln[,'R']) #Extraction des tailles de population de B. proii
+Pearson_Bp <- cor.test(Bp, donnees$bogustonia_proii, method = "pearson") #test de Pearson
+Pearson_Bp$estimate
+
+Ap <- as.numeric(soln[,'C']) #Extraction des tailles de population de A. predatoria
+Pearson_Ap <- cor.test(Ap, donnees$aleastonia_predatora, method = "pearson") #test de Pearson
+Pearson_Ap$estimate
+
 
 #Montecarlo - corrélation optimale ----
 
@@ -76,38 +90,31 @@ R0 <- 25
 C0 <- 20
 CI <- c(R=R0, C=C0)
 
-iterations <- 1
+#Préparation des paramètres finaux
 meilleure_correlation <- 0
 meilleur_r <- 0
 meilleur_ac <- 0
 meilleur_m <- 0
-epsilon <- 1
 
-for(iterations in 1:10000){
+for(iterations in 1:5){ #boucle pour tester plusieurs variables
   
-  print(iterations)
-  
-  #Parametre
-  r <- runif(1,0,1)
-  ac <- runif(1,0,0.1)
-  m <- runif(1,0,1)
-  para_cor <- c(r=r, ac=ac, epsilon=epsilon, m=m)
+  #Paramètre (estimer d'abord à tâton)
+  r <- runif(1,0,0.5)
+  ac <- runif(1,0,0.5)
+  m <- runif(1,0,0.5)
+  para_cor <- c(r=r, ac=ac, m=m)
   
   #calcul de la solution
   RC_soln <- ode(y=CI, times= seq(1,337), func= Bp_Ap_CR, parms= para_cor)
 
-  if(length(donnees$bogustonia_proii) == nrow(RC_soln)){
+  if(length(donnees$bogustonia_proii) == nrow(RC_soln)){ #Si la solution ode n'a pas plantée
   
   #Corrélation
-    Bp <- as.numeric(RC_soln[,'R'])
-    Pearson_Bp <- cor.test(Bp, donnees$bogustonia_proii, method = "pearson")
-    estimate_Bp <- Pearson_Bp$estimate
-    
-    Ap <- as.numeric(RC_soln[,'C'])
-    Pearson_Ap <- cor.test(Ap, donnees$aleastonia_predatora, method = "pearson")
+    Ap <- as.numeric(RC_soln[,'C']) #Extraction des tailles de population de A. predatoria
+    Pearson_Ap <- cor.test(Ap, donnees$aleastonia_predatora, method = "pearson") #test de Pearson
     estimate_Ap <- Pearson_Ap$estimate
     
-    estimate <- estimate_Bp + estimate_Ap
+    estimate <- estimate_Ap #+ estimate_Bp
   
   #enregistrement des paramètres
     if(estimate > meilleure_correlation){
@@ -119,18 +126,25 @@ for(iterations in 1:10000){
         
   } #fin if taille vecteurs
   
-  iterations <- iterations + 1
-  
 }#fin boucle for
 
-para_cor <- c(r=meilleur_r,ac=meilleur_ac,
-              epsilon=1,m=meilleur_m)
-soln_cor <- ode(y=CI, times= seq(1,337), func= Bp_Ap_CR, parms= para_cor)
+para_cor <- c(r=meilleur_r,ac=meilleur_ac,m=meilleur_m) #enregistrement des paramètres finaux
+soln_cor <- ode(y=CI, times= seq(1,337), func= Bp_Ap_CR, parms= para_cor) #solution finale
 
-ggplot() +
+ggplot() + #illustration du modèle et des données
   geom_line(aes(soln_cor[,'time'], soln_cor[,'R']), color = 'cyan2') +
   geom_line(aes(soln_cor[,'time'], soln_cor[,'C']), color = 'salmon2') +
   geom_line(aes(donnees$X, donnees$bogustonia_proii), color = 'blue2') +
   geom_line(aes(donnees$X, donnees$aleastonia_predatora), color = 'red2') +
   labs(title = "Modèle Consommateur-Ressource", x = "Temps écoulé (h)", y = "Nombre d'individus") +
   theme_minimal()
+
+
+###############################
+Ap <- as.numeric(RC_soln[,'C']) #Extraction des tailles de population de A. predatoria
+Pearson_Ap <- cor.test(Ap, donnees$aleastonia_predatora, method = "pearson") #test de Pearson
+estimate_Ap <- Pearson_Ap$estimate
+
+Bp <- as.numeric(RC_soln[,'R']) #Extraction des tailles de population de B. proii
+Pearson_Bp <- cor.test(Bp, donnees$bogustonia_proii, method = "pearson") #test de Pearson
+estimate_Bp <- Pearson_Bp$estimate
