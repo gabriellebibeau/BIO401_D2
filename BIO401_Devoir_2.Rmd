@@ -317,6 +317,7 @@ e|f
 
 Expliquer brièvement comment la taille de la population totale ($N$) influence la dynamique stochastique du modèle de métapopulation.  
 
+La dynamique stochastique influence chaque évènement de colonisation et d'extinction séparemment, contrairement au modèle déterministique qui assume que ces dernières suivent toujours le même taux. Le modèle stochastique sont imprévisible quant à la taille de la population (ou toutes autres variables dépendantes) au prochain pas de temps. Cela fait en sorte que, dans les petites populations, un évènement (peu importe le résultat) affecte fortement la population. Un individu, lorsqu'il y en a 100 au total, représente 1% de la population. Il peut donc à lui seul avoir des répercussions importantes sur la taille de la population. Au contraire, les grandes populations, par exemple de 10 000 individus, ne sont que très peu affectées par un seul individu qui ne représente alors que 0,01% de la population. On peut appliqué ce concept au modèle de métapopulation parce qu'une plus grande population colonise généralement plus de sites et la proportion de sites colonisés est influencé par le même phénomène. Donc, à une faible population, la proportion de sites colonisés aura tendance à varier plus fortement entre chaque pas de temps, alors qu'à une grande population, la proportion de sites colonisés restera plus près de l'équilibre une fois atteint (il sera moins affecté par l'effet stochastique).
 
 ***
 
