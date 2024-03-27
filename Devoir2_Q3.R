@@ -3,23 +3,10 @@ library(deSolve)
 library(ggplot2)
 library(patchwork)
 
-#modèle stochastique ----
-source('Devoir2_Q2.R')
+#Modèles ----
+source('Devoir2_Q2.R') #lecture de la fonction stochatique
 
-
-#modèle méchanistique ----
-metapopMech <- function(t, P, parms = c(c,e,N)){
-  with(as.list(parms), { #Ouverture des vecteurs
-    
-    #Modèle (Nocc = P*N)
-    dP <- c*P*N*(1-P) - e*P*N #dP/dt
-    
-    #Résultats
-    res <- c(P=dP*P) #Proportion de sites colonisés
-    return(list(res))
-    
-  }) #fin with
-} #fin fonction
+source('Devoir2_Q3_modmec.R') #lecture de la fonction déterministique
 
 
 #Simulation N=100 ----
@@ -33,6 +20,7 @@ c <- 2
 e <- 1
 para <- c(c=c,e=e, N=N)
 
+
 #Simulation stochastique
 mat_sto_100 <- matrix(NA, nrow = 51, ncol = 4) #Création d'une matrice pour enregistrée les données
 mat_sto_100[,1] <- seq(0,50) #La première colonne est les pas de temps
@@ -40,7 +28,6 @@ for (i in 1:3) { #Boucle pour produire 3 résultats différents
   sto_100 <- metapopGill(c,e,N,N0,50) #Résultat du modèle stochastique
   mat_sto_100[,i+1] <- sto_100[,'P'] #Enregistrement des solutions
 }
-
 
 a <- ggplot()+
   geom_line(aes(mat_sto_100[,1], mat_sto_100[,2]), color = 'salmon') +
